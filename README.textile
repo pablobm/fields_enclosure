@@ -1,0 +1,82 @@
+h1. fields_enclosure
+
+h2. Introduction
+
+_fields_enclosure_ is a plugin for Ruby on Rails.
+
+In short. Take the following ERB code that makes use of FormBuilder:
+
+<pre>
+  <%= form_for @thing do |f| %>
+    <%= f.enclosure :p %><%= f.text_field :title %><% end %>
+    <%= f.enclosure :p %><%= f.text_area  :body %><% end %>
+  <% end %>
+</pre>
+
+Assuming that the field *_title_ has an error* (in the ActiveRecord sense), the following output is produced:
+
+<pre><code>
+  <form action="/thing" class="new_thing" id="new_thing" method="post">
+    <p class="containsErrors"><input id="thing_title" name="thing[title]" size="30" type="text" value="bad value" /></p>
+    <p><textarea id="thing_body name="thing[body]">Body of the thing</textarea></p>
+  </form>
+</code></pre>
+
+
+h2. A bit more of detail
+
+This plugin allows you to define HTML tags (_enclosures_) that will be given a class name _containsErrors_ when any of the fields contained within has an ActiveRecord error. This requires the use of FormBuilder.
+
+The _enclosure_ method accepts two arguments, both optional:
+
+<pre><code>
+  # enclosure(enclosing_tag = 'div', options = {})
+  #
+  #   - enclosing_tag: tag name of the HTML element that will
+  #                    surround the enclosed block. By default,
+  #                    it will be a DIV.
+  #   - options: will be passed on to the _content_tag()_ call what will
+  #              ultimately generate the enclosing tag. Typically it
+  #              will contain HTML attributes.
+</code></pre>
+
+
+h2. Further tweaking
+
+h3. Generated output
+
+If you don't like the HTML output produced by the _enclosure_ call, you may easily adapt it to your own needs. The default implementation provided by the plugin is the following:
+
+<pre>
+  @@enclosure_proc = Proc.new do |template, enclosing_html_tag, enclosed_html, has_errors, options|
+    options[:class] = options[:class] ? (options[:class] + ' containsErrors') : 'containsErrors' if has_errors
+    template.content_tag(enclosing_html_tag, enclosed_html, options)
+  end
+  cattr_accessor :enclosure_proc
+</pre>
+
+In order to tweak it, simply redefine _enclosure_proc_ in your confing/environment.rb (or even better, in one of your initializers):
+
+<pre><code>
+  ActionView::Base.enclosure_proc = Proc.new do |template, enclosing_html_tag, enclosed_html, has_errors, options|
+    # Do as you wish here. Received parameters are:
+    #   - template: an instance of ActionView::Base you'll need if you plan to use helper methods
+    #   - enclosing_html_tag: first argument passed on the f.enclosure() call
+    #   - enclosed_html: the HTML output of the enclosed block
+    #   - has_errors: does the enclosed block contain any ActiveRecord errors?
+    #   - options: second  (and optional) argument passed on the f.enclosure() call
+  end
+</code></pre>
+
+h3. What about the fieldWithErrors bit?
+
+On a related note, you may also want to change the way Rails renders those tags with the class name _fieldWithErrors_. That's allowed by rails without the need of any plugin. See the example:
+
+<pre>
+  ActionView::Base.field_error_proc = Proc.new{ |html_tag, instance| "<span class=\"field_with_errors\">#{html_tag}</span>" }
+</pre>
+
+For details, check out "this post":http://blog.imperialdune.com/2007/3/25/fieldwitherrors .
+
+
+Copyright (c) 2008 Pablo Brasero Moreno, released under the MIT license
