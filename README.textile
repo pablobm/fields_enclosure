@@ -8,8 +8,8 @@ In short. Take the following ERB code that makes use of FormBuilder:
 
 <pre>
   <%= form_for @thing do |f| %>
-    <%= f.enclosure :p %><%= f.text_field :title %><% end %>
-    <%= f.enclosure :p %><%= f.text_area  :body %><% end %>
+    <%= f.enclosure %><%= f.text_field :title %><% end %>
+    <%= f.enclosure %><%= f.text_area  :body %><% end %>
   <% end %>
 </pre>
 
@@ -17,8 +17,8 @@ Assuming that the field *_title_ has an error* (in the ActiveRecord sense), the 
 
 <pre><code>
   <form action="/thing" class="new_thing" id="new_thing" method="post">
-    <p class="containsErrors"><input id="thing_title" name="thing[title]" size="30" type="text" value="bad value" /></p>
-    <p><textarea id="thing_body name="thing[body]">Body of the thing</textarea></p>
+    <div class="containsErrors"><input id="thing_title" name="thing[title]" size="30" type="text" value="bad value" class="fieldWithErrors" /></div>
+    <div><textarea id="thing_body name="thing[body]">Body of the thing</textarea></div>
   </form>
 </code></pre>
 
