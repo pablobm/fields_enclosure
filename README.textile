@@ -7,7 +7,7 @@ _fields_enclosure_ is a plugin for Ruby on Rails.
 In short. Take the following ERB code that makes use of FormBuilder:
 
 <pre>
-  <%= form_for @thing do |f| %>
+  <% form_for @thing do |f| %>
     <%= f.enclosure %><%= f.text_field :title %><% end %>
     <%= f.enclosure %><%= f.text_area  :body %><% end %>
   <% end %>
